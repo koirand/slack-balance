@@ -1,4 +1,4 @@
-package ufj
+package mufg
 
 import (
 	"github.com/chromedp/chromedp"

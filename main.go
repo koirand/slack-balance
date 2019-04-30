@@ -8,13 +8,19 @@ import (
 
 	"github.com/chromedp/chromedp"
 	"github.com/koirand/slack-balance/config"
+	"github.com/koirand/slack-balance/moneyforward"
+	"github.com/koirand/slack-balance/mufg"
 	"github.com/koirand/slack-balance/slack"
-	"github.com/koirand/slack-balance/ufj"
 	"github.com/koirand/slack-balance/utils"
 )
 
-const jsonStr string = `{
-	"text": ":moneybag: 三菱UFJ銀行の残高は %s です！",
+const mufgJson string = `{
+	"text": ":moneybag: Balance of MUFG: %s"
+}
+`
+
+const mfJson string = `{
+	"text": ":moneybag: Balance list of Money Forward:\n%s",
 }
 `
 
@@ -25,17 +31,34 @@ func main() {
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
-	// run task list
-	var balance string
-	err := chromedp.Run(ctx, ufj.GetBalance(config.Config.UfjId, config.Config.UfjPassword, &balance))
-	if err != nil {
-		log.Fatalf("Failed to get balance: %s\n", err.Error())
+	// get MUFG balance
+	var mufgBalance string
+	if err := chromedp.Run(ctx, mufg.GetBalance(config.Config.MUFGId, config.Config.MUFGPassword, &mufgBalance)); err != nil {
+		log.Fatalf("Failed to get MUFG balance: %s\n", err.Error())
 	}
-	log.Printf("UFJ bank balance: %s", balance)
+	log.Printf("MUFG balance: %s", mufgBalance)
 
-	// send to slack
-	message := fmt.Sprintf(jsonStr, balance)
+	// send MUFG balance to slack
+	message := fmt.Sprintf(mufgJson, mufgBalance)
 	if err := slack.SendMessage(config.Config.WebhookUrl, strings.NewReader(message)); err != nil {
 		log.Fatalf("Failed to send to slack: %s\n", err.Error())
 	}
+
+	// get Money Forward balance
+	var mfBalance string
+	if err := chromedp.Run(ctx, moneyforward.GetBalance(config.Config.MFEmail, config.Config.MFPassword)); err != nil {
+		log.Fatalf("Failed to get Money Forward balance: %s\n", err.Error())
+	}
+	for i := 0; i < len(moneyforward.Keys); i++ {
+		mfBalance += moneyforward.Keys[i].NodeValue +
+			": " + strings.Trim(moneyforward.Values[i].NodeValue, "\n") + "\n"
+	}
+	log.Printf("Money Forward balance list:\n%s\n", mfBalance)
+
+	// send Money Forward balance to slack
+	message = fmt.Sprintf(mfJson, mfBalance)
+	if err := slack.SendMessage(config.Config.WebhookUrl, strings.NewReader(message)); err != nil {
+		log.Fatalf("Failed to send to slack: %s\n", err.Error())
+	}
+
 }

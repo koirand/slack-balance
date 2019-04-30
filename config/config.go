@@ -7,9 +7,11 @@ import (
 )
 
 type ConfigList struct {
-	WebhookUrl  string
-	UfjId       string
-	UfjPassword string
+	WebhookUrl   string
+	MUFGId       string
+	MUFGPassword string
+	MFEmail      string
+	MFPassword   string
 }
 
 var Config ConfigList
@@ -21,8 +23,10 @@ func init() {
 	}
 
 	Config = ConfigList{
-		WebhookUrl:  cfg.Section("slack").Key("webhook_url").String(),
-		UfjId:       cfg.Section("ufj").Key("id").String(),
-		UfjPassword: cfg.Section("ufj").Key("password").String(),
+		WebhookUrl:   cfg.Section("slack").Key("webhook_url").String(),
+		MUFGId:       cfg.Section("mufg").Key("id").String(),
+		MUFGPassword: cfg.Section("mufg").Key("password").String(),
+		MFEmail:      cfg.Section("moneyforward").Key("email").String(),
+		MFPassword:   cfg.Section("moneyforward").Key("password").String(),
 	}
 }
