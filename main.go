@@ -20,11 +20,11 @@ func main() {
 	utils.LoggingSetting()
 	balance, err := ufj.GetBalance(config.Config.UfjId, config.Config.UfjPassword)
 	if err != nil {
-		fmt.Printf("Failed to get balance: %s", err.Error())
+		log.Fatalf("Failed to get balance: %s\n", err.Error())
 	}
 	message := fmt.Sprintf(jsonBody, balance)
 
 	if err := slack.SendMessage(config.Config.WebhookUrl, strings.NewReader(message)); err != nil {
-		log.Fatalf("Failed to send to slack: %s", err.Error())
+		log.Fatalf("Failed to send to slack: %s\n", err.Error())
 	}
 }
