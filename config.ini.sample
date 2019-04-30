@@ -1,0 +1,6 @@
+[slack]
+webhook_url = https://hooks.slack.com/services/XXX/XXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+[ufj]
+id = 12345678
+password = xxxxxxxxxx
