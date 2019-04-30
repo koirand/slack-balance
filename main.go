@@ -12,7 +12,7 @@ import (
 )
 
 const jsonBody string = `{
-	"text": "三菱UFJ銀行の残高: %s",
+	"text": ":moneybag: 三菱UFJ銀行の残高は %s です！",
 }
 `
 
